@@ -39,6 +39,6 @@ jobs:
           prerelease: true
           fail_on_unmatched_files: false
           append_body: true
-          files: |
-            ${{join(fromJson(steps.download.outputs.downloaded_files), '
+          files: |-
+            ${{join(steps.download.outputs.downloaded_files, '
             ')}}
