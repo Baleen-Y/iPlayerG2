@@ -7,6 +7,7 @@ name: Release
 on: [push]
 
 jobs:
+    
   release:
     name: Release
     strategy:
@@ -26,8 +27,6 @@ jobs:
           node-version: 16 #lts/*
 
       - name: clone
-        env:
-          sha: ${{steps.sha.outputs.value}} 
         run: |
           ls -alF
           rm -rf *
@@ -61,23 +60,19 @@ jobs:
           path: package.json
           key: version
 
-      - name: create release
-        id: release
-        uses: actions/create-release@v1.0.0
-        env:
-          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+      - name: Release
+        uses: softprops/action-gh-release@v1
         with:
           tag_name: v${{steps.package.outputs.version}}
-          release_name: V${{steps.package.outputs.version}}
+          name: V${{steps.package.outputs.version}}
           draft: false
           prerelease: true
-
-      - name: Upload Release
-        uses: Ireoo/upload-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.release.outputs.upload_url }}
-          dir: release
-          exts: '["exe", "dmg", "zip", "appimage", "deb", "rpm", "apk", "msi", "pkg", "appx", "blockmap", "yml"]'
-          suffix: ""
+          fail_on_unmatched_files: false
+          append_body: true
+          files: |
+            release/*.exe
+            release/*.blockmap
+            release/latest.yml
+            release/*.dmg
+            release/latest-mac.yml
+            release/mas-universal/*.pkg
