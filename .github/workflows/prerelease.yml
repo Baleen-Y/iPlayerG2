@@ -1,0 +1,76 @@
+name: Prerelease
+
+# on:
+#   schedule:
+#     # * is a special character in YAML so you have to quote this string
+#     - cron: "5 * * * *"
+on: [push, workflow_dispatch]
+
+jobs:
+  prerelease:
+    name: Prerelease
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, windows-latest]
+    runs-on: ${{matrix.os}}
+
+    steps:
+      - name: init
+        uses: actions/checkout@v1
+
+      - name: set node
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16 #lts/*
+
+      - name: clone
+        run: |
+          ls -alF
+          rm -rf *
+          rm -rf .git
+          rm -rf .github
+          ls -alF
+          git clone -b dev ${{secrets.GIT_ADDRESS}} .
+        shell: bash
+
+      - name: install
+        run: npm i
+
+      - name: rmi:old
+        run: npm run rmi:old
+
+      - name: win
+        if: startsWith(matrix.os, 'windows')
+        run: npm run app:windows
+
+      - name: mac
+        if: startsWith(matrix.os, 'macOS')
+        run: |
+          npm run build:prod
+          npm run mac:dmg
+          npm run mac:mas
+
+      - name: get package
+        id: package
+        uses: Ireoo/get-package@v1
+        with:
+          path: package.json
+          key: version
+
+      - name: Prerelease
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{steps.package.outputs.version}}-alpha
+          name: v${{steps.package.outputs.version}}-alpha
+          draft: false
+          prerelease: true
+          fail_on_unmatched_files: false
+          append_body: true
+          files: |
+            release/*.exe
+            release/*.blockmap
+            release/latest.yml
+            release/*.dmg
+            release/latest-mac.yml
+            release/mas-universal/*.pkg
