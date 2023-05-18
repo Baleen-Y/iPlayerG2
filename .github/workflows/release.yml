@@ -10,6 +10,7 @@ jobs:
   release:
     name: Release
     strategy:
+      fail-fast: false
       matrix:
         os: [macos-latest, windows-latest]
     runs-on: ${{matrix.os}}
@@ -37,7 +38,7 @@ jobs:
         shell: bash
         
       - name: install
-        run: yarn
+        run: npm i
         
       - name: rmi:old
         run: npm run rmi:old
