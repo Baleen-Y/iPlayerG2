@@ -39,6 +39,9 @@ jobs:
       - name: install
         run: yarn
         
+      - name: rmi:old
+        run: npm run rmi:old
+        
       - name: win
         if: startsWith(matrix.os, 'windows')
         run: npm run app:windows
