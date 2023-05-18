@@ -63,8 +63,8 @@ jobs:
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: v${{steps.package.outputs.version}}
-          name: v${{steps.package.outputs.version}}
+          tag_name: v${{steps.package.outputs.version}}-alpha
+          name: v${{steps.package.outputs.version}}-alpha
           draft: false
           prerelease: true
           fail_on_unmatched_files: false
