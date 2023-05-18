@@ -29,6 +29,7 @@ jobs:
         with:
           tag: ${{inputs.alphaVersion}}
           fileName: "*"
+          out-file-path: "release"
 
       - name: release
         uses: softprops/action-gh-release@v1
@@ -39,6 +40,4 @@ jobs:
           prerelease: true
           fail_on_unmatched_files: false
           append_body: true
-          files: |-
-            ${{join(steps.download.outputs.downloaded_files, '
-            ')}}
+          files: release/*
