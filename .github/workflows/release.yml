@@ -62,7 +62,7 @@ jobs:
           tag_name: v${{steps.package.outputs.version}}
           release_name: V${{steps.package.outputs.version}}
           draft: false
-          prerelease: false
+          prerelease: true
 
       - name: Upload Release
         uses: Ireoo/upload-release@v1
