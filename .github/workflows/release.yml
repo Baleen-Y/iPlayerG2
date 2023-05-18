@@ -37,14 +37,8 @@ jobs:
       - name: install
         run: yarn
         
-#       - name: brew install
-#         run: brew install rpm
-        
-      - name: build mac:dmg
-        run: npm run app:mac:dmg
-
-      - name: build window
-        run: npm run windows
+      - name: build
+        run: npm run build:all
 
       - name: get package
         id: package
@@ -70,6 +64,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.release.outputs.upload_url }}
-          dir: build
-          exts: '["exe", "dmg", "zip", "appimage", "deb", "rpm", "apk", "msi", "pkg", "appx"]'
+          dir: release
+          exts: '["exe", "dmg", "zip", "appimage", "deb", "rpm", "apk", "msi", "pkg", "appx", "blockmap", "yml"]'
           suffix: ""
