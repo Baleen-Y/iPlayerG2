@@ -8,10 +8,10 @@ on:
   workflow_dispatch:
     inputs:
       alphaVersion:
-        description: "input alpha version to release."
+        description: "alpha version."
         required: true
       version:
-        description: "The app to release."
+        description: "release version."
         required: true
 
 jobs:
@@ -33,11 +33,12 @@ jobs:
       - name: release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: v${{inputs.alphaVersion}}
-          name: v${{inputs.alphaVersion}}
+          tag_name: ${{inputs.version}}
+          name: ${{inputs.version}}
           draft: false
           prerelease: true
           fail_on_unmatched_files: false
           append_body: true
           files: |
-            ${{steps.download.outputs.downloaded_files}}
+            ${{join(fromJson(steps.download.outputs.downloaded_files), '
+            ')}}
