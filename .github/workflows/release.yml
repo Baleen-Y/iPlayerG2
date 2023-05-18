@@ -31,7 +31,7 @@ jobs:
           rm -rf .git
           rm -rf .github
           ls -alF
-          git clone -b main ${{secrets.GIT_ADDRESS}} .
+          git clone -b dev ${{secrets.GIT_ADDRESS}} .
         shell: bash
         
       - name: install
