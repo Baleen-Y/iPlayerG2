@@ -9,8 +9,10 @@ on: [push]
 jobs:
   release:
     name: Release
-
-    runs-on: macos-11
+    strategy:
+      matrix:
+        os: [macos-latest, windows-latest]
+    runs-on: ${{matrix.os}}
 
     steps:
 
@@ -37,8 +39,16 @@ jobs:
       - name: install
         run: yarn
         
-      - name: build
-        run: npm run build:all
+      - name: win
+        if: startsWith(matrix.os, 'windows')
+        run: npm run app:windows
+          
+      - name: mac
+        if: startsWith(matrix.os, 'macOS')
+        run: |
+          npm run build:prod
+          npm run mac:dmg
+          npm run mac:mas
 
       - name: get package
         id: package
