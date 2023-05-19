@@ -72,5 +72,6 @@ jobs:
             release/*.blockmap
             release/latest.yml
             release/*.dmg
+            release/*.zip
             release/latest-mac.yml
             release/mas-universal/*.pkg
