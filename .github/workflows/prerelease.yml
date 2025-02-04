@@ -33,7 +33,7 @@ jobs:
           rm -rf .git
           rm -rf .github
           ls -alF
-          git clone -b temp1227 ${{secrets.GIT_ADDRESS}} .
+          git clone -b dev ${{secrets.GIT_ADDRESS}} .
         shell: bash
       - name: Backup original package.json
         run: cp package.json package.json.bak
