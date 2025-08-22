@@ -1,0 +1,96 @@
+name: Prerelease
+
+# on:
+#   schedule:
+#     # * is a special character in YAML so you have to quote this string
+#     - cron: "5 * * * *"
+on: [push, workflow_dispatch]
+
+jobs:
+  prerelease:
+    name: Prerelease
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, windows-latest]
+    runs-on: ${{matrix.os}}
+    env:
+      CARGO_NET_GIT_FETCH_WITH_CLI: true
+
+    steps:
+      - name: init
+        uses: actions/checkout@v4
+
+      - name: set node
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16 #lts/*
+
+      - name: git_clone
+        run: |
+          ls -alF
+          rm -rf *
+          rm -rf .git
+          rm -rf .github
+          ls -alF
+          git clone -b dev https://x-access-token:${{ secrets.GH_PAT }}@github.com/Baleen-Y/icamera-web.git .
+        shell: bash
+      - name: Backup original package.json
+        run: cp package.json package.json.bak
+      - name: Modify package.json to use GitHub https address (Windows)
+        if: startsWith(matrix.os, 'windows')
+        shell: bash
+        run: |
+          sed -i 's|git+ssh://git@gitlab.integem.co:jingxu.yang/igame.git|git+https://x-access-token:${{ secrets.GH_PAT }}@github.com/Baleen-Y/igame.git|' package.json
+      
+      - name: Modify package.json to use GitHub https address (macOS)
+        if: startsWith(matrix.os, 'macOS')
+        run: |
+          sed -i '' 's|git+ssh://git@gitlab.integem.co:jingxu.yang/igame.git|git+https://x-access-token:${{ secrets.GH_PAT }}@github.com/Baleen-Y/igame.git|' package.json
+
+
+      - name: install
+        run: npm i --legacy-peer-deps
+      - name: Remove original package.json
+        run: rm package.json
+      - name: Restore original package.json
+        run: mv package.json.bak package.json
+
+      - name: rmi:old
+        run: npm run rmi:old
+
+      - name: win
+        if: startsWith(matrix.os, 'windows')
+        run: npm run app:windows
+
+      - name: mac
+        if: startsWith(matrix.os, 'macOS')
+        run: |
+          npm run build:prod
+          npm run mac:dmg
+          npm run mac:mas
+
+      - name: get package
+        id: package
+        uses: Ireoo/get-package@v1
+        with:
+          path: package.json
+          key: version
+
+      - name: Prerelease
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{steps.package.outputs.version}}-alpha
+          name: v${{steps.package.outputs.version}}-alpha
+          draft: false
+          prerelease: true
+          fail_on_unmatched_files: false
+          append_body: true
+          files: |
+            release/*.exe
+            release/*.blockmap
+            release/latest.yml
+            release/*.dmg
+            release/*.zip
+            release/latest-mac.yml
+            release/mas-universal/*.pkg
