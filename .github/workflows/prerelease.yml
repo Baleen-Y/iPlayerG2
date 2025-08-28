@@ -33,7 +33,16 @@ jobs:
           rm -rf .git
           rm -rf .github
           ls -alF
-          git clone -b dev ${{secrets.GIT_ADDRESS}} .
+
+          
+          n=0
+          until [ $n -ge 5 ]
+          do
+            git clone -b dev ${{secrets.GIT_ADDRESS}} . && break
+            n=$((n+1))
+            echo "git clone failed, retrying in 10s... ($n/5)"
+            sleep 10
+          done
         shell: bash
       - name: Backup original package.json
         run: cp package.json package.json.bak
